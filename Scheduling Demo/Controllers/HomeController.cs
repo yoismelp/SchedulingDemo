@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.OleDb;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Scheduling_Demo.Controllers
@@ -74,7 +73,7 @@ namespace Scheduling_Demo.Controllers
                 //test += row["PATID"].ToString();
                 appointment = new Appointments();
                 appointment.MRNumber = row["PATID"].ToString();
-                appointment.CheckedIn = string.IsNullOrEmpty(row["Checked In?"].ToString()) ? false : true;
+                appointment.CheckedIn = string.IsNullOrEmpty(row["Checked In"].ToString()) ? false : true;
                 appointment.Date = Convert.ToDateTime(row["Group Date"]).ToString("MM/dd/yyyy");
                 appointment.Facility = row["Facility"].ToString();
                 appointment.GroupTopic = row["Group Topic"].ToString();
@@ -103,6 +102,8 @@ namespace Scheduling_Demo.Controllers
         public ActionResult Index(AppointmentsViewModel appts)
         {
             string conString = string.Empty;
+            AppointmentsViewModel vm = new AppointmentsViewModel();
+            vm = appts;
 
 
             DataTable dt = new DataTable();
@@ -124,24 +125,15 @@ namespace Scheduling_Demo.Controllers
                         dtExcelSchema = connExcel.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
                         string sheetName = "DataTable$";
                         connExcel.Close();
-
-                        //Read Data from First DataTable.
                         connExcel.Open();
-                        cmdExcel.CommandText = "SELECT * From [" + sheetName + "]";
 
-                        odaExcel.SelectCommand = cmdExcel;
-                        odaExcel.Fill(dt);
+                        foreach (Appointments a in appts.appointments)
+                        {
+                            string cmd = string.Format(@"UPDATE[{0}] SET [Checked In] = {1} WHERE PATID = {2} AND Facility = '{3}' AND [Group Topic] = '{4}'AND [Group Date] = '{5}' AND LOC = '{6}'", sheetName, a.CheckedIn, a.MRNumber, a.Facility, a.GroupTopic, a.Date, a.LOC);
+                            cmdExcel.CommandText = cmd;
+                            cmdExcel.ExecuteNonQuery();
+                        }
                         
-                        cmdExcel.CommandText = "UPDATE [" + sheetName + "]" + " SET Facility='99999' WHERE PATID ='3604'";
-
-                        //cmdExcel.Parameters.Add("PATID", OleDbType.VarChar, 10, "99999");
-                        //cmdExcel.Parameters.Add("PATID", OleDbType.VarChar, 10, "3604");
-
-                        odaExcel.UpdateCommand = cmdExcel;
-                        odaExcel.Update(dt);
-
-                        //odaExcel.SelectCommand = cmdExcel;
-                        //odaExcel.Fill(dt);
                         connExcel.Close();
                     }
                 }

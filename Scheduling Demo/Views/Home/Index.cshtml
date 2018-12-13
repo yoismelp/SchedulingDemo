@@ -14,6 +14,7 @@
 
     @using (Html.BeginForm())
     {
+        
     <table class="table" style="align-content:center">
         <tr>
             <th>
@@ -43,7 +44,7 @@
             {
                 color = "green";
             }
-
+            @Html.HiddenFor(model => Model.appointments[t].Episode)
         <tr bgcolor="@color">
             <td>
                 @Html.DisplayFor(model => Model.appointments[t].Facility)
