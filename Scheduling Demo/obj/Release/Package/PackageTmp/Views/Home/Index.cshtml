@@ -1,0 +1,74 @@
+﻿@model Scheduling_Demo.Models.AppointmentsViewModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<div>
+    <h4>Appointments</h4>
+    <hr />
+
+
+    @using (Html.BeginForm())
+    {
+    <table class="table" style="align-content:center">
+        <tr>
+            <th>
+                @Html.LabelFor(model => model.appointments.FirstOrDefault().Facility)
+            </th>
+            <th>
+                @Html.LabelFor(model => model.appointments.FirstOrDefault().MRNumber)
+            </th>
+            <th>
+                @Html.LabelFor(model => model.appointments.FirstOrDefault().GroupTopic)
+            </th>
+            <th>
+                @Html.LabelFor(model => model.appointments.FirstOrDefault().Date)
+            </th>
+            <th>
+                @Html.LabelFor(model => model.appointments.FirstOrDefault().LOC)
+            </th>
+            <th>
+                @Html.LabelFor(model => model.appointments.FirstOrDefault().CheckedIn)
+            </th>
+        </tr>
+
+        @for (int t = 0; t < Model.appointments.Count; t++)
+        {
+            string color = string.Empty;
+            if (Model.appointments[t].CheckedIn == true)
+            {
+                color = "green";
+            }
+
+        <tr bgcolor="@color">
+            <td>
+                @Html.DisplayFor(model => Model.appointments[t].Facility)
+            </td>
+            <td>
+                @Html.DisplayFor(model => Model.appointments[t].MRNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(model => Model.appointments[t].GroupTopic)
+            </td>
+            <td>
+                @Html.DisplayFor(model => Model.appointments[t].Date)
+            </td>
+            <td>
+                @Html.DisplayFor(model => Model.appointments[t].LOC)
+            </td>
+            <td>
+                @Html.CheckBoxFor(model => Model.appointments[t].CheckedIn)
+            </td>
+        </tr>
+}
+
+    </table>
+    <input type="submit" name="Submit" value="Submit"/>
+    }
+
+
+</div>
