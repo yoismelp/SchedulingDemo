@@ -4,37 +4,44 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.OleDb;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace Scheduling_Demo.Controllers
 {
     public class HomeController : Controller
     {
+        [HttpGet]
+        public ActionResult ParameterPage()
+        {
+            ParameterPageModel ppm = new ParameterPageModel();
+            DataAccessLayer da = new DataAccessLayer();
+            ppm.GroupTopics = da.GetListOfGroupTopics();
+            
+            ppm.GroupDate = null;
 
-        
+            ViewBag.CurrentDate = DateTime.Now.ToString("MM/dd/yyyy");
+            
+            return View(ppm);
+        }
+
+        [HttpPost]
+        public ActionResult ParameterPage(ParameterPageModel ppm)
+        {
+            return RedirectToAction("Index", new { Facility = ppm.SelectedFacility, GroupTopic = ppm.SelectedGroupTopic, GroupDate = ppm.GroupDate, LOC = ppm.SelectedLOC });
+        }
+
+
 
         [HttpGet]
-        public ActionResult Index()
+        public ActionResult Index(string Facility, string GroupTopic, DateTime GroupDate, string LOC)
         {
-            AppointmentsViewModel appts = new AppointmentsViewModel();
-            //string filePath = string.Empty;
-            //if (postedFile != null)
-            //{
-            //string path = Server.MapPath(@"C:\Users\yperez\Desktop\GroupScheduling.xlsm");
-            //if (!Directory.Exists(path))
-            //{
-            //    Directory.CreateDirectory(path);
-            //}
-
-            //filePath = path;
-            //string extension = Path.GetExtension(postedFile.FileName);
-            // postedFile.SaveAs(filePath);
+            AppointmentsViewModel vm = new AppointmentsViewModel();
 
             string conString = string.Empty;
-                
 
-                DataTable dt = new DataTable();
-                conString = ConfigurationManager.ConnectionStrings["ExcleConn"].ConnectionString;
+            DataTable dt = new DataTable();
+            conString = ConfigurationManager.ConnectionStrings["ExcleConn"].ConnectionString;
             string test = string.Empty;
 
                 using (OleDbConnection connExcel = new OleDbConnection(conString))
@@ -53,9 +60,25 @@ namespace Scheduling_Demo.Controllers
 
                         //Read Data from First DataTable.
                         connExcel.Open();
-                        cmdExcel.CommandText = "SELECT * From [" + sheetName + "]";
+                        cmdExcel.CommandText = "SELECT * " +
+                            "From [" + sheetName + "] " +
+                            "WHERE Facility = @Facility AND [Group Topic] = @GroupTopic AND [Group Date] = @GroupDate AND LOC = @LOC" ;
+
+                        cmdExcel.Parameters.Add("@Facility", SqlDbType.NVarChar);
+                        cmdExcel.Parameters["@Facility"].Value = Facility;
+
+                        cmdExcel.Parameters.Add("@GroupTopic", SqlDbType.NVarChar);
+                        cmdExcel.Parameters["@GroupTopic"].Value = GroupTopic;
+
+                        cmdExcel.Parameters.Add("@GroupDate", SqlDbType.DateTime);
+                        cmdExcel.Parameters["@GroupDate"].Value = GroupDate;
+
+                        cmdExcel.Parameters.Add("@LOC", SqlDbType.NVarChar);
+                        cmdExcel.Parameters["@LOC"].Value = LOC;
 
                         odaExcel.SelectCommand = cmdExcel;
+                        
+
                         odaExcel.Fill(dt);
                         connExcel.Close();
                         }
@@ -73,37 +96,26 @@ namespace Scheduling_Demo.Controllers
                 //test += row["PATID"].ToString();
                 appointment = new Appointments();
                 appointment.MRNumber = row["PATID"].ToString();
-                appointment.CheckedIn = string.IsNullOrEmpty(row["Checked In"].ToString()) ? false : true;
-                appointment.Date = Convert.ToDateTime(row["Group Date"]).ToString("MM/dd/yyyy");
+                appointment.CheckedIn = string.IsNullOrEmpty(row["Checked In"].ToString()) || row["Checked In"].ToString().Equals("0")
+                    ? false 
+                    : true;
+                appointment.GroupDate = Convert.ToDateTime(row["Group Date"]).ToString("MM/dd/yyyy");
                 appointment.Facility = row["Facility"].ToString();
                 appointment.GroupTopic = row["Group Topic"].ToString();
                 appointment.LOC = row["LOC"].ToString();
                 apList.Add(appointment);
-
-                //    entities.MRNumber.Add(new Customer
-                //    {
-                //        Name = row["Name"].ToString(),
-                //        Country = row["Country"].ToString()
-                //    });
-
                 }
-            appts.appointments = apList;
-            //entities.SaveChanges();
-            //}
+            vm.appointments = apList;         
 
-            // return test;
-           
-
-
-            return View(appts);
+            return View(vm);
         }
 
         [HttpPost]
-        public ActionResult Index(AppointmentsViewModel appts)
+        public ActionResult Index(AppointmentsViewModel vm)
         {
             string conString = string.Empty;
-            AppointmentsViewModel vm = new AppointmentsViewModel();
-            vm = appts;
+            //AppointmentsViewModel vm1 = new AppointmentsViewModel();
+            //vm1.appointments.AddRange(vm.appointments);
 
 
             DataTable dt = new DataTable();
@@ -127,19 +139,54 @@ namespace Scheduling_Demo.Controllers
                         connExcel.Close();
                         connExcel.Open();
 
-                        foreach (Appointments a in appts.appointments)
+                        foreach (Appointments a in vm.appointments)
                         {
-                            string cmd = string.Format(@"UPDATE[{0}] SET [Checked In] = {1} WHERE PATID = {2} AND Facility = '{3}' AND [Group Topic] = '{4}'AND [Group Date] = '{5}' AND LOC = '{6}'", sheetName, a.CheckedIn, a.MRNumber, a.Facility, a.GroupTopic, a.Date, a.LOC);
+                            string checkedInDate = a.CheckedIn ? DateTime.Now.ToString("MM/dd/yyyy") : string.Empty;
+                            string checkedInTime = a.CheckedIn ? DateTime.Now.ToString("hh:mm tt") : string.Empty;
+                            string cmd = string.Format(@"
+UPDATE[{0}] 
+SET [Checked In] = @CheckedIn, [Date Checked In] = '{1}', [Time] = '{2}'
+WHERE PATID = @PATID
+AND Facility = @Facility 
+AND [Group Topic] = @GroupTopic 
+AND LOC = @LOC 
+AND [Group Date] = @GroupDate", sheetName, checkedInDate, checkedInTime);
+                            
                             cmdExcel.CommandText = cmd;
+
+                            cmdExcel.Parameters.Add("@CheckedIn", SqlDbType.Bit);
+                            cmdExcel.Parameters["@CheckedIn"].Value = a.CheckedIn;
+
+                            cmdExcel.Parameters.Add("@PATID", SqlDbType.Int);
+                            cmdExcel.Parameters["@PATID"].Value = a.MRNumber;
+
+                            cmdExcel.Parameters.Add("@Facility", SqlDbType.NVarChar);
+                            cmdExcel.Parameters["@Facility"].Value = a.Facility;
+
+                            cmdExcel.Parameters.Add("@GroupTopic", SqlDbType.NVarChar);
+                            cmdExcel.Parameters["@GroupTopic"].Value = a.GroupTopic;
+
+                            cmdExcel.Parameters.Add("@LOC", SqlDbType.NVarChar);
+                            cmdExcel.Parameters["@LOC"].Value = a.LOC;
+
+                            cmdExcel.Parameters.Add("@GroupDate", SqlDbType.Date);
+                            cmdExcel.Parameters["@GroupDate"].Value = Convert.ToDateTime(a.GroupDate);
+
+
                             cmdExcel.ExecuteNonQuery();
                         }
-                        
+
                         connExcel.Close();
                     }
                 }
             }
 
-            return RedirectToAction("Index");
+            string facility = vm.appointments.Select(x => x.Facility).FirstOrDefault().ToString();
+            string groupTopic = vm.appointments.Select(x => x.GroupTopic).FirstOrDefault().ToString();
+            string groupDate = vm.appointments.Select(x => x.GroupDate).FirstOrDefault();
+            string loc = vm.appointments.Select(x => x.LOC).FirstOrDefault();
+
+            return RedirectToAction("ParameterPage");//, new { Facility = facility, GroupTopic = groupTopic, GroupDate = groupDate, LOC = loc });
         }
     }
 }

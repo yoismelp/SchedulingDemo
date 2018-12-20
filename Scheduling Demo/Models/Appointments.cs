@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Scheduling_Demo.Models
 {
@@ -6,17 +6,20 @@ namespace Scheduling_Demo.Models
     {
 
         public string Facility { get; set; }
-        [DisplayName("MR#")]
+
+        [Display(Name = "MR#")]
         public string MRNumber { get; set; }
 
-        [DisplayName("Group Topic")]
+        [Display(Name = "Group Topic")]
         public string GroupTopic { get; set; }
 
-        public string Date { get; set; }
+        
         public string LOC { get; set; }
-        public int Episode { get; set; }
 
-        [DisplayName("Checked In?")]
+        [Display(Name = "Checked In?")]
         public bool CheckedIn { get; set; }
+
+        [Display(Name = "Group Date")]
+        public string GroupDate { get; set; }
     }
 }

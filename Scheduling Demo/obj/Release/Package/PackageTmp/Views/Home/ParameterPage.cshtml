@@ -1,0 +1,178 @@
+﻿@model Scheduling_Demo.Models.ParameterPageModel
+
+
+
+@{
+    ViewBag.Title = "ParameterPage";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    List<SelectListItem> listItems = new List<SelectListItem>();
+    listItems.Add(new SelectListItem
+    {
+        Text = "The Recovery Village",
+        Value = "The Recovery Village"
+    });
+    listItems.Add(new SelectListItem
+    {
+        Text = "Orlando Recovery Village",
+        Value = "Orlando Recovery Village",
+        Selected = true
+    });
+
+    List<SelectListItem> GroupTopics = new List<SelectListItem>();
+    GroupTopics.Add(new SelectListItem
+    {
+        Text = "Daily Intentions",
+        Value = "Daily Intentions"
+    });
+
+
+    List<SelectListItem> LOCList = new List<SelectListItem>();
+    LOCList.Add(new SelectListItem
+    {
+        Text = "HLOC",
+        Value = "HLOC"
+    });
+    LOCList.Add(new SelectListItem
+    {
+        Text = "LLOC",
+        Value = "LLOC",
+    });
+
+
+    //LOCList.Add(new SelectListItem
+    //{
+    //    Text = "SunHLOC",
+    //    Value = "SunHLOC"
+    //});
+    //LOCList.Add(new SelectListItem
+    //{
+    //    Text = "MonHLOC",
+    //    Value = "MonHLOC",
+    //});
+    //LOCList.Add(new SelectListItem
+    //{
+    //    Text = "TuesHLOC",
+    //    Value = "TuesHLOC",
+    //});
+    //LOCList.Add(new SelectListItem
+    //{
+    //    Text = "WedHLOC",
+    //    Value = "WedHLOC",
+    //});
+    //LOCList.Add(new SelectListItem
+    //{
+    //    Text = "ThurHLOC",
+    //    Value = "ThurHLOC",
+    //});
+    //LOCList.Add(new SelectListItem
+    //{
+    //    Text = "FriHLOC",
+    //    Value = "FriHLOC",
+    //});
+    //LOCList.Add(new SelectListItem
+    //{
+    //    Text = "SatHLOC",
+    //    Value = "SatHLOC",
+    //});
+    //LOCList.Add(new SelectListItem
+    //{
+    //    Text = "SunLLOC",
+    //    Value = "SunLLOC"
+    //});
+    //LOCList.Add(new SelectListItem
+    //{
+    //    Text = "MonLLOC",
+    //    Value = "MonLLOC",
+    //});
+    //LOCList.Add(new SelectListItem
+    //{
+    //    Text = "TuesLLOC",
+    //    Value = "TuesLLOC",
+    //});
+    //LOCList.Add(new SelectListItem
+    //{
+    //    Text = "WedLLOC",
+    //    Value = "WedLLOC",
+    //});
+    //LOCList.Add(new SelectListItem
+    //{
+    //    Text = "ThurLLOC",
+    //    Value = "ThurLLOC",
+    //});
+    //LOCList.Add(new SelectListItem
+    //{
+    //    Text = "FriLLOC",
+    //    Value = "FriLLOC",
+    //});
+    //LOCList.Add(new SelectListItem
+    //{
+    //    Text = "SatLLOC",
+    //    Value = "SatLLOC",
+    //});
+}
+
+<h2 class="alert-info">Reservation Look Up</h2>
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Facility, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.SelectedFacility, new SelectList(listItems, "Value", "Text"), new { @name = "Facility" })
+                @Html.ValidationMessageFor(model => model.SelectedFacility, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.SelectedGroupTopic, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.SelectedGroupTopic, new SelectList(Model.GroupTopics, "Value", "Text"), new { @name = "GroupTopic" })
+                @Html.ValidationMessageFor(model => model.SelectedGroupTopic, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+
+            @Html.LabelFor(model => model.GroupDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.GroupDate, new { htmlAttributes = new { @class = "form-control datepicker", placeholder = "Ex. " + ViewBag.CurrentDate, id = "GroupDate" } })
+                @Html.ValidationMessageFor(model => model.GroupDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.SelectedLOC, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.SelectedLOC, new SelectList(LOCList, "Value", "Text"), new { @name = "LOC" })
+                @Html.ValidationMessageFor(model => model.SelectedLOC, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Show Results" class="btn btn-success" id="btn" />
+            </div>
+        </div>
+    </div>
+
+    <div class="Processing" style="display: none; width:20px; height: 20px">
+        <img src="~/Content/Processing.gif" />
+    </div>
+}
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/jqueryunobtrusive")
+    <script src="~/Scripts/CustomJS.js"></script>
+    <link href="~/Content/Site.css" rel="stylesheet" />
+}
