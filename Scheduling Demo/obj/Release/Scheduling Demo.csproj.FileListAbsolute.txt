@@ -71,3 +71,4 @@ C:\Users\yperez\source\repos\Scheduling Demo\Scheduling Demo\obj\Release\Schedul
 C:\Users\yperez\source\repos\Scheduling Demo\Scheduling Demo\obj\Release\Scheduling Demo.csproj.CopyComplete
 C:\Users\yperez\source\repos\Scheduling Demo\Scheduling Demo\obj\Release\Scheduling Demo.dll
 C:\Users\yperez\source\repos\Scheduling Demo\Scheduling Demo\obj\Release\Scheduling Demo.pdb
+C:\Users\yperez\source\repos\Scheduling Demo\Scheduling Demo\obj\Release\Scheduling Demo.csprojResolveAssemblyReference.cache

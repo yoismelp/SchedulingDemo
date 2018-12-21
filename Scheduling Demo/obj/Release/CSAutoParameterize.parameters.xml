@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
-  <parameter name="ExcleConn-Web.config Connection String" description="ExcleConn Connection String used in web.config by the application to access the database." defaultValue="Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\pv12571fsw01\TRV_Departments\TRVSchedulingDemoApp\GroupScheduling.xlsm;&#xD;&#xA;         Extended Properties='Excel 12.0 Macro;HDR=YES';Persist Security Info=False;" tags="SqlConnectionString">
+  <parameter name="ExcleConn-Web.config Connection String" description="ExcleConn Connection String used in web.config by the application to access the database." defaultValue="Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\pv12571fsw01\TRV_Departments\TRVSchedulingDemoApp\GroupScheduling.xlsm;&#xD;&#xA;         Extended Properties='Excel 12.0 Macro;HDR=YES;IMEX=0;Persist Security Info=False;ReadOnly=0;'" tags="SqlConnectionString">
     <parameterEntry kind="XmlFile" scope="C:\\Users\\yperez\\source\\repos\\Scheduling\ Demo\\Scheduling\ Demo\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='ExcleConn']/@connectionString" />
   </parameter>
 </parameters>

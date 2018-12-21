@@ -151,14 +151,14 @@ AND Facility = @Facility
 AND [Group Topic] = @GroupTopic 
 AND LOC = @LOC 
 AND [Group Date] = @GroupDate", sheetName, checkedInDate, checkedInTime);
-                            
+
                             cmdExcel.CommandText = cmd;
 
                             cmdExcel.Parameters.Add("@CheckedIn", SqlDbType.Bit);
                             cmdExcel.Parameters["@CheckedIn"].Value = a.CheckedIn;
 
-                            cmdExcel.Parameters.Add("@PATID", SqlDbType.Int);
-                            cmdExcel.Parameters["@PATID"].Value = a.MRNumber;
+                            cmdExcel.Parameters.Add("@PATID", SqlDbType.VarChar);
+                            cmdExcel.Parameters["@PATID"].Value = a.MRNumber.ToString();
 
                             cmdExcel.Parameters.Add("@Facility", SqlDbType.NVarChar);
                             cmdExcel.Parameters["@Facility"].Value = a.Facility;
@@ -186,7 +186,12 @@ AND [Group Date] = @GroupDate", sheetName, checkedInDate, checkedInTime);
             string groupDate = vm.appointments.Select(x => x.GroupDate).FirstOrDefault();
             string loc = vm.appointments.Select(x => x.LOC).FirstOrDefault();
 
-            return RedirectToAction("ParameterPage");//, new { Facility = facility, GroupTopic = groupTopic, GroupDate = groupDate, LOC = loc });
+            return RedirectToAction("Confirmation");//, new { Facility = facility, GroupTopic = groupTopic, GroupDate = groupDate, LOC = loc });
+        }
+
+        public ActionResult Confirmation()
+        {
+            return View();
         }
     }
 }

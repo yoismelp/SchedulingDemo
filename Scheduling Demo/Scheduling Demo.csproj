@@ -210,6 +210,8 @@
     <Content Include="Views\Home\ParameterPage.cshtml" />
     <Content Include="Views\MissedVisit\MissedVisit.cshtml" />
     <Content Include="Views\MissedVisit\ShowMissedVisits.cshtml" />
+    <Content Include="Views\Home\Confirmation.cshtml" />
+    <Content Include="Views\Shared\Layout_1.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
