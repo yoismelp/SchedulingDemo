@@ -58,15 +58,26 @@ namespace Scheduling_Demo.Controllers
                         connExcel.Open();
                         cmdExcel.CommandText = "SELECT * " +
                             "From [" + sheetName + "] " +
-                            "WHERE [Group Date] = @GroupDate " +
-                            " AND ([Checked In] IS NULL OR [Checked In] = False) " +
-                            " AND [Group Time] <= @GroupTime";
+                            "WHERE ([Group Date] = @GroupDate AND @MissedVisitDate < @CurrentDate " +
+                            " AND ([Checked In] IS NULL OR [Checked In] = False OR [Checked In] = 0) " +
+                            ") OR " +
+                            "([Group Date] = @GroupDate AND @MissedVisitDate = @CurrentDate " +
+                            " AND ([Checked In] IS NULL OR [Checked In] = False OR [Checked In] = 0) " +
+                            " AND ([Group Time] IS NULL OR [Group Time] < @GroupTime)" +
+                            ")";
 
                         cmdExcel.Parameters.Add("@GroupDate", SqlDbType.DateTime);
                         cmdExcel.Parameters["@GroupDate"].Value = missedVisitDate;
 
                         cmdExcel.Parameters.Add("@GroupTime", SqlDbType.NVarChar);
                         cmdExcel.Parameters["@GroupTime"].Value = DateTime.Now.ToString("HH:MM");
+
+
+                        cmdExcel.Parameters.Add("@CurrentDate", SqlDbType.DateTime);
+                        cmdExcel.Parameters["@CurrentDate"].Value = DateTime.Now.ToString("yyyy-MM-dd");
+
+                        cmdExcel.Parameters.Add("@MissedVisitDate", SqlDbType.DateTime);
+                        cmdExcel.Parameters["@MissedVisitDate"].Value = Convert.ToDateTime(missedVisitDate).ToString("yyyy-MM-dd");
 
                         odaExcel.SelectCommand = cmdExcel;
 
